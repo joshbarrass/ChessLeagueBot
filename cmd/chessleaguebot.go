@@ -15,7 +15,7 @@ type Configuration struct {
 	BotToken   string `envconfig:"BOT_TOKEN" required:"true"`
 	WebhookURL string `envconfig:"WEBHOOK_URL" required:"true"`
 	ListenAddr string `envconfig:"LISTEN_ADDRESS" default:"0.0.0.0"`
-	ListenPort string `envconfig:"PORT" default:"80"`
+	ListenPort string `envconfig:"PORT" default:"5000"`
 }
 
 func main() {
@@ -35,15 +35,15 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("Could not parse webhook URL: %s", err)
 	}
-	// check if port exists in webhook and update config if so
-	if webhookPort := webhook.Port(); webhookPort != "" {
-		if config.ListenPort != webhookPort && config.ListenPort != "8080" {
-			logrus.Fatalf("Differing ports were specified: %s and %s", webhookPort, config.ListenPort)
-		}
-		config.ListenPort = webhookPort
-	}
-	// set the port in the listen address
-	webhook.Host = fmt.Sprintf("%s:%s", webhook.Hostname(), config.ListenPort)
+	// // check if port exists in webhook and update config if so
+	// if webhookPort := webhook.Port(); webhookPort != "" {
+	// 	if config.ListenPort != webhookPort && config.ListenPort != "8080" {
+	// 		logrus.Fatalf("Differing ports were specified: %s and %s", webhookPort, config.ListenPort)
+	// 	}
+	// 	config.ListenPort = webhookPort
+	// }
+	// // set the port in the listen address
+	// webhook.Host = fmt.Sprintf("%s:%s", webhook.Hostname(), config.ListenPort)
 
 	// add the bot token to the URL
 	webhook.Path = filepath.Join(webhook.Path, config.BotToken)
@@ -64,8 +64,9 @@ func main() {
 	updates := bot.ListenForWebhook(webhook.String())
 	logrus.Infof("Set webook; will listen on URL '%s'", webhook.String())
 	// TODO: potentially use ListenAndServeTLS
-	go http.ListenAndServe(fmt.Sprintf("%s:%s", config.ListenAddr, config.ListenPort), nil)
-	logrus.Info("Serving on webhook...")
+	serveOn := fmt.Sprintf("%s:%s", config.ListenAddr, config.ListenPort)
+	go http.ListenAndServe(serveOn, nil)
+	logrus.Info("Serving webhook on %s", serveOn)
 
 	for update := range updates {
 		// do something
