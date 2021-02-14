@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"path/filepath"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/kelseyhightower/envconfig"
@@ -14,7 +15,7 @@ type Configuration struct {
 	BotToken   string `envconfig:"BOT_TOKEN" required:"true"`
 	WebhookURL string `envconfig:"WEBHOOK_URL" required:"true"`
 	ListenAddr string `envconfig:"LISTEN_ADDRESS" default:"0.0.0.0"`
-	ListenPort string `envconfig:"LISTEN_PORT" default:"80"`
+	ListenPort string `envconfig:"PORT" default:"80"`
 }
 
 func main() {
@@ -43,6 +44,9 @@ func main() {
 	}
 	// set the port in the listen address
 	webhook.Host = fmt.Sprintf("%s:%s", webhook.Hostname(), config.ListenPort)
+
+	// add the bot token to the URL
+	webhook.Path = filepath.Join(webhook.Path, config.BotToken)
 
 	// TODO: potentially use NewWebhookWithCert
 	_, err = bot.SetWebhook(tgbotapi.NewWebhook(webhook.String()))
