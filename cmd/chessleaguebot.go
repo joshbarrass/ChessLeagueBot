@@ -48,6 +48,7 @@ func main() {
 	// add the bot token to the URL
 	webhook.Path = filepath.Join(webhook.Path, config.BotToken)
 
+	logrus.Infof("Attempting to set webhook to '%s'", webhook.String())
 	// TODO: potentially use NewWebhookWithCert
 	_, err = bot.SetWebhook(tgbotapi.NewWebhook(webhook.String()))
 	if err != nil {
