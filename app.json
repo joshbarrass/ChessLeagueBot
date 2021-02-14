@@ -1,0 +1,20 @@
+{
+  "name": "Chess League Bot",
+  "description": "A Telegram bot for running chess leagues",
+  "keywords": [
+    "go",
+    "chess",
+    "telegram",
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/go"
+    },
+  ],
+  "addons": [
+    {
+      "plan": "cleardb:ignite",
+      "as": "CLEARDB_DATABASE",
+    }
+  ],
+}
