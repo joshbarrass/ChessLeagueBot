@@ -63,7 +63,7 @@ func main() {
 	}
 
 	updates := bot.ListenForWebhook(webhook.Path)
-	logrus.Infof("Set webook; will listen on URL '%s'", webhook.String())
+	logrus.Infof("Set webook; will listen on '%s'", webhook.Path)
 	// TODO: potentially use ListenAndServeTLS
 	serveOn := fmt.Sprintf("%s:%s", "0.0.0.0", herokuConfig.Port)
 	go func() {
