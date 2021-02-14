@@ -100,11 +100,16 @@ func main() {
 			"content":  update.Message.Text,
 		}).Info("Received message")
 
-		replyText := fmt.Sprintf("[From %d] %s", update.Message.From.ID, update.Message.Text)
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, replyText)
-		_, err = bot.Send(msg)
-		if err != nil {
-			logrus.Errorf("Failed to send message: %s", err)
+		if update.Message.IsCommand() {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+			switch update.Message.Command() {
+			case "start":
+				msg.Text = "Welcome to the Chess League Bot!"
+			default:
+				msg.Text = "Unknown command"
+			}
+			msg.ReplyToMessageID = update.Message.MessageID
+			bot.Send(msg)
 		}
 	}
 }
