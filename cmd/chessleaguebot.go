@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/joshbarrass/ChessLeagueBot/internal"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
 )
@@ -101,12 +102,14 @@ func main() {
 		}).Info("Received message")
 
 		if update.Message.IsCommand() {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "")
+			var msg tgbotapi.MessageConfig
 			switch update.Message.Command() {
 			case "start":
-				msg.Text = "Welcome to the Chess League Bot!"
+				msg, err = internal.CommandStart(update)
+			case "info":
+				msg, err = internal.CommandInfo(update)
 			default:
-				msg.Text = "Unknown command"
+				msg, err = internal.CommandUnknown(update)
 			}
 			msg.ReplyToMessageID = update.Message.MessageID
 			bot.Send(msg)
