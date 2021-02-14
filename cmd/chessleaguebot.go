@@ -99,5 +99,12 @@ func main() {
 			"username": update.Message.From.UserName,
 			"content":  update.Message.Text,
 		}).Info("Received message")
+
+		replyText := fmt.Sprintf("[From %d] %s", update.Message.From.ID, update.Message.Text)
+		msg := tgbotapi.NewMessage(update.Message.Chat.ID, replyText)
+		_, err = bot.Send(msg)
+		if err != nil {
+			logrus.Errorf("Failed to send message: %s", err)
+		}
 	}
 }
