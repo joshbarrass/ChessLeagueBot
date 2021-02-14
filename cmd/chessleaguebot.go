@@ -78,11 +78,17 @@ func main() {
 	for update := range updates {
 		// do something
 		logrus.WithFields(logrus.Fields{
-			"update":  update,
-			"message": update.Message,
+			"update": update,
 		}).Info("Received update")
 		if update.Message == nil {
 			continue
 		}
+		logrus.WithFields(logrus.Fields{
+			"ID":       update.Message.MessageID,
+			"chat_ID":  update.Message.Chat.ID,
+			"user_ID":  update.Message.From.ID,
+			"username": update.Message.From.UserName,
+			"content":  update.Message.Text,
+		}).Info("Received message")
 	}
 }
