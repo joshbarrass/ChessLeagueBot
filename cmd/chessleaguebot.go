@@ -14,8 +14,10 @@ import (
 type Configuration struct {
 	BotToken   string `envconfig:"BOT_TOKEN" required:"true"`
 	WebhookURL string `envconfig:"WEBHOOK_URL" required:"true"`
-	ListenAddr string `envconfig:"LISTEN_ADDRESS" default:"0.0.0.0"`
-	ListenPort string `envconfig:"PORT" default:"5000"`
+}
+
+type HerokuConfig struct {
+	Port string `envconfig:"PORT" default:"5000"`
 }
 
 func main() {
@@ -23,6 +25,11 @@ func main() {
 	err := envconfig.Process("CLB", &config)
 	if err != nil {
 		logrus.Fatalf("Failed to process config: %s", err)
+	}
+	var herokuConfig HerokuConfig
+	err = envconfig.Process("", &herokuConfig)
+	if err != nil {
+		logrus.Fatalf("Failed to parse Heroku config: %s", err)
 	}
 
 	bot, err := tgbotapi.NewBotAPI(config.BotToken)
@@ -35,15 +42,8 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("Could not parse webhook URL: %s", err)
 	}
-	// // check if port exists in webhook and update config if so
-	// if webhookPort := webhook.Port(); webhookPort != "" {
-	// 	if config.ListenPort != webhookPort && config.ListenPort != "8080" {
-	// 		logrus.Fatalf("Differing ports were specified: %s and %s", webhookPort, config.ListenPort)
-	// 	}
-	// 	config.ListenPort = webhookPort
-	// }
-	// // set the port in the listen address
-	// webhook.Host = fmt.Sprintf("%s:%s", webhook.Hostname(), config.ListenPort)
+	// set port in webhook
+	webhook.Host = fmt.Sprintf("%s:%s", webhook.Hostname(), herokuConfig.Port)
 
 	// add the bot token to the URL
 	webhook.Path = filepath.Join(webhook.Path, config.BotToken)
@@ -64,9 +64,9 @@ func main() {
 	updates := bot.ListenForWebhook(webhook.String())
 	logrus.Infof("Set webook; will listen on URL '%s'", webhook.String())
 	// TODO: potentially use ListenAndServeTLS
-	serveOn := fmt.Sprintf("%s:%s", config.ListenAddr, config.ListenPort)
+	serveOn := fmt.Sprintf("%s:%s", "0.0.0.0", herokuConfig.Port)
 	go http.ListenAndServe(serveOn, nil)
-	logrus.Info("Serving webhook on %s", serveOn)
+	logrus.Infof("Serving webhook on %s", serveOn)
 
 	for update := range updates {
 		// do something
