@@ -61,7 +61,7 @@ func main() {
 		logrus.Fatalf("Telegram callback failed: %s", info.LastErrorMessage)
 	}
 
-	updates := bot.ListenForWebhook(webhook.String())
+	updates := bot.ListenForWebhook(webhook.Path)
 	logrus.Infof("Set webook; will listen on URL '%s'", webhook.String())
 	// TODO: potentially use ListenAndServeTLS
 	serveOn := fmt.Sprintf("%s:%s", "0.0.0.0", herokuConfig.Port)
