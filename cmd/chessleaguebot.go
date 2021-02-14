@@ -12,8 +12,9 @@ import (
 )
 
 type Configuration struct {
-	BotToken   string `envconfig:"BOT_TOKEN" required:"true"`
-	WebhookURL string `envconfig:"WEBHOOK_URL" required:"true"`
+	BotToken    string `envconfig:"BOT_TOKEN" required:"true"`
+	WebhookURL  string `envconfig:"WEBHOOK_URL" required:"true"`
+	WebhookPort string `envconfig:"WEBHOOK_PORT" default:"443"`
 }
 
 type HerokuConfig struct {
@@ -43,7 +44,7 @@ func main() {
 		logrus.Fatalf("Could not parse webhook URL: %s", err)
 	}
 	// set port in webhook
-	webhook.Host = fmt.Sprintf("%s:%s", webhook.Hostname(), "443")
+	webhook.Host = fmt.Sprintf("%s:%s", webhook.Hostname(), config.WebhookPort)
 
 	// add the bot token to the URL
 	webhook.Path = filepath.Join(webhook.Path, config.BotToken)
@@ -76,8 +77,12 @@ func main() {
 
 	for update := range updates {
 		// do something
-		logrus.WithField(
-			"update", update,
-		).Info("Received update")
+		logrus.WithFields(logrus.Fields{
+			"update":  update,
+			"message": update.Message,
+		}).Info("Received update")
+		if update.Message == nil {
+			continue
+		}
 	}
 }
