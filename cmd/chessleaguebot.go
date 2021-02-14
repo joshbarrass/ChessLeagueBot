@@ -66,8 +66,13 @@ func main() {
 	logrus.Infof("Set webook; will listen on URL '%s'", webhook.String())
 	// TODO: potentially use ListenAndServeTLS
 	serveOn := fmt.Sprintf("%s:%s", "0.0.0.0", herokuConfig.Port)
-	go http.ListenAndServe(serveOn, nil)
-	logrus.Infof("Serving webhook on %s", serveOn)
+	go func() {
+		logrus.Infof("Serving webhook on %s", serveOn)
+		if err := http.ListenAndServe(serveOn, nil); err != nil {
+			logrus.Fatalf("http listener exited with error: %s", err)
+		}
+		logrus.Fatal("http listener exited without error")
+	}()
 
 	for update := range updates {
 		// do something
