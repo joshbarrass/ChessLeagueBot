@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -77,9 +78,17 @@ func main() {
 
 	for update := range updates {
 		// do something
-		logrus.WithFields(logrus.Fields{
-			"update": update,
-		}).Info("Received update")
+		marshalledUpdate, err := json.Marshal(update)
+		if err != nil {
+			logrus.WithFields(logrus.Fields{
+				"update": update,
+			}).Info("Received update")
+		} else {
+			logrus.WithFields(logrus.Fields{
+				"update": string(marshalledUpdate),
+			}).Info("Received update")
+		}
+
 		if update.Message == nil {
 			continue
 		}
