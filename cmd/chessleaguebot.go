@@ -42,8 +42,8 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("Could not parse webhook URL: %s", err)
 	}
-	// set port in webhook
-	webhook.Host = fmt.Sprintf("%s:%s", webhook.Hostname(), herokuConfig.Port)
+	// // set port in webhook
+	// webhook.Host = fmt.Sprintf("%s:%s", webhook.Hostname(), herokuConfig.Port)
 
 	// add the bot token to the URL
 	webhook.Path = filepath.Join(webhook.Path, config.BotToken)
