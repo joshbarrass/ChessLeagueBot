@@ -14,7 +14,7 @@ type Configuration struct {
 	BotToken   string `envconfig:"BOT_TOKEN" required:"true"`
 	WebhookURL string `envconfig:"WEBHOOK_URL" required:"true"`
 	ListenAddr string `envconfig:"LISTEN_ADDRESS" default:"0.0.0.0"`
-	ListenPort string `envconfig:"LISTEN_PORT" default:"8080"`
+	ListenPort string `envconfig:"LISTEN_PORT" default:"80"`
 }
 
 func main() {
