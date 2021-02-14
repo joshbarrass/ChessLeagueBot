@@ -1,1 +1,1 @@
-web: bin/chessleaguebot
+web: bin/cmd
